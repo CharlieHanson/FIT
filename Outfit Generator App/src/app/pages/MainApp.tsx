@@ -51,14 +51,14 @@ const sampleWardrobe: ClothingItem[] = [
     name: 'Brown Leather Shoes',
     category: 'shoes',
     colors: ['brown'],
-    style: ['work', 'formal', 'casual'],
+    style: ['work', 'formal', 'casual', 'date'],
   },
   {
     id: '7',
     name: 'White Sneakers',
     category: 'shoes',
     colors: ['white'],
-    style: ['casual', 'workout', 'outdoor'],
+    style: ['casual', 'workout', 'outdoor', 'date'],
   },
   {
     id: '8',
@@ -76,10 +76,10 @@ const sampleWardrobe: ClothingItem[] = [
   },
   {
     id: '10',
-    name: 'Navy Polo Shirt',
-    category: 'tops',
-    colors: ['navy'],
-    style: ['casual', 'work'],
+    name: 'White Sweatpants',
+    category: 'bottoms',
+    colors: ['white'],
+    style: ['casual', 'workout'],
   },
   {
     id: '12',
@@ -87,6 +87,20 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'tops',
     colors: ['white', 'navy'],
     style: ['casual', 'outdoor'],
+  },
+  {
+    id: '13',
+    name: 'Adidas Ultraboost',
+    category: 'shoes',
+    colors: ['black', 'white'],
+    style: ['casual', 'outdoor', 'workout'],
+  },
+  {
+    id: '14',
+    name: '"I paused my game to be here" T-shirt',
+    category: 'tops',
+    colors: ['green'],
+    style: ['casual', 'workout'],
   },
   {
     id: '15',
@@ -111,6 +125,13 @@ const sampleWardrobe: ClothingItem[] = [
   },
   {
     id: '19',
+    name: 'Black Rain Coat',
+    category: 'outerwear',
+    colors: ['black'],
+    style: ['outdoor'],
+  },
+  {
+    id: '20',
     name: 'Gray Wool Trousers',
     category: 'bottoms',
     colors: ['gray'],
@@ -178,13 +199,6 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'accessories',
     colors: ['black'],
     style: ['casual', 'outdoor', 'date'],
-  },
-  {
-    id: '31',
-    name: 'Patterned Scarf',
-    category: 'accessories',
-    colors: ['red', 'beige'],
-    style: ['casual', 'outdoor', 'work'],
   },
   {
     id: '32',
