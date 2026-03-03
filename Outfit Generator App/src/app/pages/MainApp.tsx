@@ -16,7 +16,7 @@ const sampleWardrobe: ClothingItem[] = [
     name: 'White Oxford Shirt',
     category: 'tops',
     colors: ['white'],
-    style: ['work', 'formal', 'casual'],
+    style: ['work', 'formal', 'date'],
   },
   {
     id: '2',
@@ -72,7 +72,7 @@ const sampleWardrobe: ClothingItem[] = [
     name: 'Gray Sweater',
     category: 'tops',
     colors: ['gray'],
-    style: ['casual', 'work', 'outdoor'],
+    style: ['casual', 'work', 'outdoor', 'date'],
   },
   {
     id: '10',
@@ -82,32 +82,11 @@ const sampleWardrobe: ClothingItem[] = [
     style: ['casual', 'work'],
   },
   {
-    id: '11',
-    name: 'Pink Blouse',
-    category: 'tops',
-    colors: ['pink'],
-    style: ['work', 'casual', 'date'],
-  },
-  {
     id: '12',
     name: 'Striped Long Sleeve Tee',
     category: 'tops',
     colors: ['white', 'navy'],
     style: ['casual', 'outdoor'],
-  },
-  {
-    id: '13',
-    name: 'Red Cardigan',
-    category: 'tops',
-    colors: ['red'],
-    style: ['casual', 'work'],
-  },
-  {
-    id: '14',
-    name: 'Black Sports Bra',
-    category: 'tops',
-    colors: ['black'],
-    style: ['workout'],
   },
   {
     id: '15',
@@ -121,14 +100,7 @@ const sampleWardrobe: ClothingItem[] = [
     name: 'Khaki Chinos',
     category: 'bottoms',
     colors: ['beige'],
-    style: ['casual', 'work'],
-  },
-  {
-    id: '17',
-    name: 'Black Leggings',
-    category: 'bottoms',
-    colors: ['black'],
-    style: ['workout', 'casual'],
+    style: ['casual', 'work', 'date'],
   },
   {
     id: '18',
@@ -142,14 +114,7 @@ const sampleWardrobe: ClothingItem[] = [
     name: 'Gray Wool Trousers',
     category: 'bottoms',
     colors: ['gray'],
-    style: ['work', 'formal'],
-  },
-  {
-    id: '20',
-    name: 'Black Pencil Skirt',
-    category: 'bottoms',
-    colors: ['black'],
-    style: ['work', 'formal'],
+    style: ['work', 'formal', 'date'],
   },
   {
     id: '21',
@@ -170,7 +135,7 @@ const sampleWardrobe: ClothingItem[] = [
     name: 'Beige Trench Coat',
     category: 'outerwear',
     colors: ['beige'],
-    style: ['work', 'formal', 'casual'],
+    style: ['work', 'formal'],
   },
   {
     id: '24',
@@ -192,13 +157,6 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'shoes',
     colors: ['navy'],
     style: ['work', 'casual'],
-  },
-  {
-    id: '27',
-    name: 'Black Heels',
-    category: 'shoes',
-    colors: ['black'],
-    style: ['work', 'formal', 'date'],
   },
   {
     id: '28',
@@ -233,7 +191,7 @@ const sampleWardrobe: ClothingItem[] = [
     name: 'Gold Necklace',
     category: 'accessories',
     colors: ['yellow'],
-    style: ['date', 'formal', 'casual'],
+    style: ['date', 'formal', 'casual','date'],
   },
   {
     id: '33',
