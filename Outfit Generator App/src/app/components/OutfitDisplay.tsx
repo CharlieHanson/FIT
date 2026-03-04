@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Shirt, BookOpen, Footprints, Wind, Watch, Calendar } from 'lucide-react';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface OutfitDisplayProps {
   outfits: Outfit[];
@@ -43,8 +44,18 @@ export function OutfitDisplay({ outfits, onSaveToCalendar }: OutfitDisplayProps)
             <CardContent className="space-y-4 pt-6">
               {outfit.top && (
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Shirt className="w-5 h-5 text-purple-600 mt-0.5" />
-                  <div className="flex-1">
+                  {outfit.top.imageUrl ? (
+                    <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-200">
+                      <ImageWithFallback
+                        src={outfit.top.imageUrl}
+                        alt={outfit.top.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <Shirt className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">Top</div>
                     <div className="text-sm text-gray-900">{outfit.top.name}</div>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -60,8 +71,18 @@ export function OutfitDisplay({ outfits, onSaveToCalendar }: OutfitDisplayProps)
 
               {outfit.bottom && (
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <BookOpen className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div className="flex-1">
+                  {outfit.bottom.imageUrl ? (
+                    <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-200">
+                      <ImageWithFallback
+                        src={outfit.bottom.imageUrl}
+                        alt={outfit.bottom.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <BookOpen className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">Bottom</div>
                     <div className="text-sm text-gray-900">{outfit.bottom.name}</div>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -77,8 +98,18 @@ export function OutfitDisplay({ outfits, onSaveToCalendar }: OutfitDisplayProps)
 
               {outfit.shoes && (
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Footprints className="w-5 h-5 text-green-600 mt-0.5" />
-                  <div className="flex-1">
+                  {outfit.shoes.imageUrl ? (
+                    <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-200">
+                      <ImageWithFallback
+                        src={outfit.shoes.imageUrl}
+                        alt={outfit.shoes.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <Footprints className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">Shoes</div>
                     <div className="text-sm text-gray-900">{outfit.shoes.name}</div>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -94,8 +125,18 @@ export function OutfitDisplay({ outfits, onSaveToCalendar }: OutfitDisplayProps)
 
               {outfit.outerwear && (
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Wind className="w-5 h-5 text-cyan-600 mt-0.5" />
-                  <div className="flex-1">
+                  {outfit.outerwear.imageUrl ? (
+                    <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-200">
+                      <ImageWithFallback
+                        src={outfit.outerwear.imageUrl}
+                        alt={outfit.outerwear.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <Wind className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">Outerwear</div>
                     <div className="text-sm text-gray-900">{outfit.outerwear.name}</div>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -111,8 +152,18 @@ export function OutfitDisplay({ outfits, onSaveToCalendar }: OutfitDisplayProps)
 
               {outfit.accessories.length > 0 && (
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Watch className="w-5 h-5 text-orange-600 mt-0.5" />
-                  <div className="flex-1">
+                  {outfit.accessories[0]?.imageUrl ? (
+                    <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0 bg-gray-200">
+                      <ImageWithFallback
+                        src={outfit.accessories[0].imageUrl}
+                        alt={outfit.accessories[0].name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <Watch className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">Accessories</div>
                     {outfit.accessories.map((accessory, i) => (
                       <div key={i} className="text-sm text-gray-900">

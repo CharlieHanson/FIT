@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Badge } from './ui/badge';
 import { Checkbox } from './ui/checkbox';
 import { Button } from './ui/button';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface WardrobeSelectorProps {
   wardrobe: ClothingItem[];
@@ -98,13 +99,22 @@ export function WardrobeSelector({
                         />
                       )}
                       {mode === 'anchor' && (
-                        <div className={`w-4 h-4 rounded-full border-2 ${
+                        <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
                           isAnchor ? 'border-purple-600 bg-purple-600' : 'border-gray-300'
                         }`}>
                           {isAnchor && <div className="w-2 h-2 bg-white rounded-full m-0.5" />}
                         </div>
                       )}
-                      <div className="flex-1">
+                      {item.imageUrl && (
+                        <div className="w-12 h-12 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
+                          <ImageWithFallback
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm">{item.name}</div>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {item.colors.map(color => (

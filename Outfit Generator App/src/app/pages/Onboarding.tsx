@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Sparkles, ArrowRight, Check } from 'lucide-react';
 import { Button } from '../components/ui/button';
