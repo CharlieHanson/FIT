@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { ClothingItem, ClothingCategory, EventType, Color } from '../types/wardrobe';
 import { Button } from './ui/button';
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from './ui/checkbox';
 import { Badge } from './ui/badge';
 import { AddClothingWithPhoto } from './AddClothingWithPhoto';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface WardrobeManagerProps {
   wardrobe: ClothingItem[];
@@ -208,24 +209,37 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
                 {groupedWardrobe[cat.value].map(item => (
                   <Card key={item.id}>
                     <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <CardTitle className="text-base">{item.name}</CardTitle>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onRemoveItem(item.id)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
+                      <div className="flex items-start gap-3">
+                        {item.imageUrl && (
+                          <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
+                            <ImageWithFallback
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <CardTitle className="text-base">{item.name}</CardTitle>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onRemoveItem(item.id)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
+                          </div>
+                          <CardDescription>
+                            {item.colors.map(color => (
+                              <Badge key={color} variant="secondary" className="mr-1 text-xs">
+                                {color}
+                              </Badge>
+                            ))}
+                          </CardDescription>
+                        </div>
                       </div>
-                      <CardDescription>
-                        {item.colors.map(color => (
-                          <Badge key={color} variant="secondary" className="mr-1 text-xs">
-                            {color}
-                          </Badge>
-                        ))}
-                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-1">

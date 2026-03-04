@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Sparkles, LogOut, Calendar as CalendarIcon } from 'lucide-react';
 import { ClothingItem, DailyPlan, Outfit } from '../types/wardrobe';
@@ -8,6 +8,7 @@ import { WardrobeSelector } from '../components/WardrobeSelector';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { pics } from '../../pics';
 
 // Sample wardrobe data
 const sampleWardrobe: ClothingItem[] = [
@@ -17,6 +18,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'tops',
     colors: ['white'],
     style: ['work', 'formal', 'date'],
+    imageUrl: pics.whiteOxford,
   },
   {
     id: '2',
@@ -24,6 +26,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'tops',
     colors: ['black'],
     style: ['casual', 'workout'],
+    imageUrl: pics.blackTShirt,
   },
   {
     id: '3',
@@ -31,6 +34,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'outerwear',
     colors: ['navy'],
     style: ['work', 'formal', 'date'],
+    imageUrl: pics.navyBlazer,
   },
   {
     id: '4',
@@ -38,6 +42,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'bottoms',
     colors: ['blue'],
     style: ['casual', 'date', 'outdoor'],
+    imageUrl: pics.jeans,
   },
   {
     id: '5',
@@ -45,6 +50,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'bottoms',
     colors: ['black'],
     style: ['work', 'formal'],
+    imageUrl: pics.blackDressPants,
   },
   {
     id: '6',
@@ -52,6 +58,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'shoes',
     colors: ['brown'],
     style: ['work', 'formal', 'casual', 'date'],
+    imageUrl: pics.brownShoes,
   },
   {
     id: '7',
@@ -59,6 +66,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'shoes',
     colors: ['white'],
     style: ['casual', 'workout', 'outdoor', 'date'],
+    imageUrl: pics.whiteSneakers,
   },
   {
     id: '8',
@@ -66,6 +74,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'accessories',
     colors: ['gray'],
     style: ['work', 'formal', 'casual', 'date'],
+    imageUrl: pics.watch,
   },
   {
     id: '9',
@@ -73,6 +82,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'tops',
     colors: ['gray'],
     style: ['casual', 'work', 'outdoor', 'date'],
+    imageUrl: pics.graySweater,
   },
   {
     id: '10',
@@ -80,6 +90,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'bottoms',
     colors: ['white'],
     style: ['casual', 'workout'],
+    imageUrl: pics.whiteSweats,
   },
   {
     id: '12',
@@ -87,6 +98,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'tops',
     colors: ['white', 'navy'],
     style: ['casual', 'outdoor'],
+    imageUrl: pics.stripedLong,
   },
   {
     id: '13',
@@ -94,13 +106,15 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'shoes',
     colors: ['black', 'white'],
     style: ['casual', 'outdoor', 'workout'],
+    imageUrl: pics.ultraboost,
   },
   {
     id: '14',
     name: '"I paused my game to be here" T-shirt',
     category: 'tops',
-    colors: ['green'],
+    colors: ['gray'],
     style: ['casual', 'workout'],
+    imageUrl: pics.pausedMyGameShirt,
   },
   {
     id: '15',
@@ -108,6 +122,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'tops',
     colors: ['beige'],
     style: ['casual', 'date', 'work'],
+    imageUrl: pics.beigeTurtle,
   },
   {
     id: '16',
@@ -115,6 +130,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'bottoms',
     colors: ['beige'],
     style: ['casual', 'work', 'date'],
+    imageUrl: pics.khakis,
   },
   {
     id: '18',
@@ -122,6 +138,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'bottoms',
     colors: ['navy'],
     style: ['casual', 'workout', 'outdoor'],
+    imageUrl: pics.navyShorts,
   },
   {
     id: '19',
@@ -129,6 +146,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'outerwear',
     colors: ['black'],
     style: ['outdoor'],
+    imageUrl: pics.blackRaincoat,
   },
   {
     id: '20',
@@ -136,6 +154,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'bottoms',
     colors: ['gray'],
     style: ['work', 'formal', 'date'],
+    imageUrl: pics.grayWoolTrousers,
   },
   {
     id: '21',
@@ -143,6 +162,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'outerwear',
     colors: ['blue'],
     style: ['casual', 'outdoor'],
+    imageUrl: pics.denimJacket,
   },
   {
     id: '22',
@@ -150,6 +170,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'outerwear',
     colors: ['black'],
     style: ['casual', 'date'],
+    imageUrl: pics.leatherJacket,
   },
   {
     id: '23',
@@ -157,6 +178,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'outerwear',
     colors: ['beige'],
     style: ['work', 'formal'],
+    imageUrl: pics.trenchCoat,
   },
   {
     id: '24',
@@ -164,6 +186,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'outerwear',
     colors: ['gray'],
     style: ['casual', 'workout', 'outdoor'],
+    imageUrl: pics.grayHoodie,
   },
   {
     id: '25',
@@ -171,6 +194,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'shoes',
     colors: ['black'],
     style: ['workout', 'casual'],
+    imageUrl: pics.blackRunning,
   },
   {
     id: '26',
@@ -178,6 +202,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'shoes',
     colors: ['navy'],
     style: ['work', 'casual'],
+    imageUrl: pics.navyLoafers,
   },
   {
     id: '28',
@@ -185,6 +210,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'shoes',
     colors: ['brown'],
     style: ['casual', 'outdoor'],
+    imageUrl: pics.brownBoots,
   },
   {
     id: '29',
@@ -192,6 +218,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'accessories',
     colors: ['brown'],
     style: ['work', 'casual', 'formal'],
+    imageUrl: pics.belt,
   },
   {
     id: '30',
@@ -199,6 +226,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'accessories',
     colors: ['black'],
     style: ['casual', 'outdoor', 'date'],
+    imageUrl: pics.sunglasses,
   },
   {
     id: '32',
@@ -206,6 +234,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'accessories',
     colors: ['yellow'],
     style: ['date', 'formal', 'casual','date'],
+    imageUrl: pics.necklace,
   },
   {
     id: '33',
@@ -213,6 +242,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'accessories',
     colors: ['black'],
     style: ['casual', 'outdoor', 'workout'],
+    imageUrl: pics.backpack,
   },
   {
     id: '34',
@@ -220,6 +250,7 @@ const sampleWardrobe: ClothingItem[] = [
     category: 'accessories',
     colors: ['beige'],
     style: ['work', 'casual'],
+    imageUrl: pics.toteBag,
   },
 ];
 
