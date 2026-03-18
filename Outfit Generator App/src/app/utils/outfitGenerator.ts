@@ -75,7 +75,7 @@ export function generateOutfit(wardrobe: ClothingItem[], plan: DailyPlan): Outfi
               top,
               bottom,
               shoes: shoe,
-              accessories: accessories.slice(0, 2), // Add up to 2 accessories
+              accessories: [...accessories].sort(() => Math.random() - 0.5).slice(0, 2),
             };
 
             // Add outerwear if weather is cool/cold
@@ -96,7 +96,7 @@ export function generateOutfit(wardrobe: ClothingItem[], plan: DailyPlan): Outfi
     bottom: bottoms[0],
     shoes: shoes[0],
     outerwear: outerwear.length > 0 ? outerwear[0] : undefined,
-    accessories: accessories.slice(0, 1),
+    accessories: [...accessories].sort(() => Math.random() - 0.5).slice(0, 1),
   };
 }
 
@@ -105,15 +105,13 @@ export function generateMultipleOutfits(wardrobe: ClothingItem[], plan: DailyPla
   const usedCombinations = new Set<string>();
 
   for (let i = 0; i < count * 10 && outfits.length < count; i++) {
-    const outfit = generateOutfit(wardrobe, plan);
+    const shuffled = [...wardrobe].sort(() => Math.random() - 0.5);
+    const outfit = generateOutfit(shuffled, plan);
     if (outfit) {
       const key = `${outfit.top?.id}-${outfit.bottom?.id}-${outfit.shoes?.id}`;
       if (!usedCombinations.has(key)) {
         usedCombinations.add(key);
         outfits.push(outfit);
-        
-        // Shuffle wardrobe slightly for next iteration
-        wardrobe = [...wardrobe].sort(() => Math.random() - 0.5);
       }
     }
   }
