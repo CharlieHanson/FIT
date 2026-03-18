@@ -114,7 +114,7 @@ export function AddClothingWithPhoto({ onAddItem }: AddClothingWithPhotoProps) {
             {!photo ? (
               <label
                 htmlFor="photo-upload"
-                className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                className="flex flex-col items-center justify-center w-full h-72 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="w-8 h-8 text-gray-400 mb-2" />
@@ -133,7 +133,7 @@ export function AddClothingWithPhoto({ onAddItem }: AddClothingWithPhotoProps) {
                 <ImageWithFallback
                   src={photo}
                   alt="Clothing item"
-                  className="w-full h-48 object-cover rounded-lg"
+                  className="w-full h-92 object-cover rounded-lg"
                 />
                 <Button
                   type="button"
