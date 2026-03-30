@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, ShoppingBag, Loader2 } from 'lucide-react';
 import { ClothingItem, ClothingCategory, EventType, Color } from '../types/wardrobe';
+import { Product } from '../types/product';
+import { fetchComplementProducts } from '../utils/productSearch';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -59,6 +61,12 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
   const [selectedColors, setSelectedColors] = useState<Color[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<EventType[]>([]);
 
+  // Shopping suggestions state
+  const [shopDialogOpen, setShopDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null);
+  const [shopProducts, setShopProducts] = useState<Product[]>([]);
+  const [shopLoading, setShopLoading] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name && selectedColors.length > 0 && selectedStyles.length > 0) {
@@ -87,6 +95,16 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
     );
   };
 
+  const handleItemClick = async (item: ClothingItem) => {
+    setSelectedItem(item);
+    setShopDialogOpen(true);
+    setShopProducts([]);
+    setShopLoading(true);
+    const products = await fetchComplementProducts(item, 4);
+    setShopProducts(products);
+    setShopLoading(false);
+  };
+
   const groupedWardrobe = categories.reduce((acc, cat) => {
     acc[cat.value] = wardrobe.filter(item => item.category === cat.value);
     return acc;
@@ -97,7 +115,7 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold">My Wardrobe</h2>
-          <p className="text-sm text-gray-600">Manage your clothing items</p>
+          <p className="text-sm text-gray-600">Manage your clothing items · Click any item to find pieces that pair with it</p>
         </div>
         <div className="flex gap-2">
           <AddClothingWithPhoto onAddItem={onAddItem} />
@@ -207,7 +225,11 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {groupedWardrobe[cat.value].map(item => (
-                  <Card key={item.id}>
+                  <Card
+                    key={item.id}
+                    className="cursor-pointer transition-shadow hover:shadow-md hover:border-purple-200"
+                    onClick={() => handleItemClick(item)}
+                  >
                     <CardHeader className="pb-3">
                       <div className="flex items-start gap-3">
                         {item.imageUrl && (
@@ -225,7 +247,10 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => onRemoveItem(item.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRemoveItem(item.id);
+                              }}
                               className="h-8 w-8 p-0"
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -257,6 +282,103 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
           </div>
         ))}
       </div>
+
+      {/* Shopping suggestions dialog */}
+      <Dialog open={shopDialogOpen} onOpenChange={setShopDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-purple-600" />
+              Pairs well with: {selectedItem?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Shopping suggestions that complement this piece
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedItem?.imageUrl && (
+            <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+              <div className="w-14 h-14 rounded-md overflow-hidden flex-shrink-0 bg-gray-200">
+                <ImageWithFallback
+                  src={selectedItem.imageUrl}
+                  alt={selectedItem.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <p className="font-medium text-sm">{selectedItem.name}</p>
+                <div className="flex gap-1 mt-1">
+                  {selectedItem.colors.map(c => (
+                    <Badge key={c} variant="secondary" className="text-xs">{c}</Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {shopLoading && (
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <Loader2 className="w-6 h-6 text-purple-600 animate-spin" />
+              <p className="text-sm text-gray-500">Finding pieces that go with this…</p>
+            </div>
+          )}
+
+          {!shopLoading && shopProducts.length === 0 && (
+            <div className="flex items-center justify-center py-12">
+              <p className="text-sm text-gray-400">No suggestions found. Try another item.</p>
+            </div>
+          )}
+
+          {!shopLoading && shopProducts.length > 0 && (
+            <div className="grid grid-cols-2 gap-4">
+              {shopProducts.map((product, i) => (
+                <ShopSuggestionCard key={product.product_id ?? i} product={product} />
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function ShopSuggestionCard({ product }: { product: Product }) {
+  const image = product.product_photos?.[0] ?? product.product_photo ?? null;
+  const retailer = product.offer?.store_name ?? product.product_source ?? '';
+  const href = product.offer?.offer_page_url ?? product.product_page_url ?? '#';
+  const price = product.offer?.price ?? product.typical_price_range?.[0] ?? '—';
+
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
+      <Card className="overflow-hidden transition-shadow hover:shadow-md">
+        <div className="relative aspect-square bg-gray-100 overflow-hidden">
+          {image ? (
+            <img
+              src={image}
+              alt={product.product_title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-3xl">👕</div>
+          )}
+          {retailer && (
+            <Badge variant="secondary" className="absolute top-2 left-2 text-xs opacity-90">
+              {retailer}
+            </Badge>
+          )}
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="bg-white rounded-full p-1 shadow">
+              <ExternalLink className="w-3 h-3 text-gray-600" />
+            </div>
+          </div>
+        </div>
+        <CardContent className="p-3">
+          <p className="text-xs text-gray-800 leading-snug line-clamp-2 mb-2">
+            {product.product_title}
+          </p>
+          <p className="text-sm font-semibold text-purple-600">{price}</p>
+        </CardContent>
+      </Card>
+    </a>
   );
 }

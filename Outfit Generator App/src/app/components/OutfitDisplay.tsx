@@ -35,8 +35,14 @@ export function OutfitDisplay({ outfits, onSaveToCalendar }: OutfitDisplayProps)
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold">Your Outfit Suggestions</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {outfits.map((outfit, index) => (
+        <div className={`grid gap-6 ${
+          outfits.length === 1 
+            ? 'grid-cols-1' 
+            : outfits.length === 2 
+              ? 'grid-cols-1 md:grid-cols-2' 
+              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+        }`}>
+          {outfits.map((outfit, index) => (
           <Card key={index} className="overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
               <CardTitle className="text-lg">Outfit {index + 1}</CardTitle>

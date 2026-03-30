@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, Cloud } from 'lucide-react';
 import { DailyPlan, EventType, Weather } from '../types/wardrobe';
+import { fetchWeatherCategory } from '../utils/weatherService';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
@@ -31,6 +32,14 @@ export function PlanInput({ onGenerateOutfit }: PlanInputProps) {
   const [event, setEvent] = useState<EventType>('casual');
   const [weather, setWeather] = useState<Weather>('warm');
   const [notes, setNotes] = useState('');
+  const [weatherAutoDetected, setWeatherAutoDetected] = useState(false);
+
+  useEffect(() => {
+    fetchWeatherCategory().then((w) => {
+      setWeather(w);
+      setWeatherAutoDetected(true);
+    });
+  }, []);
 
   const handleGenerate = () => {
     onGenerateOutfit({
@@ -88,6 +97,9 @@ export function PlanInput({ onGenerateOutfit }: PlanInputProps) {
               ))}
             </SelectContent>
           </Select>
+          {weatherAutoDetected && (
+            <p className="text-xs text-gray-400">Auto-detected from your location</p>
+          )}
         </div>
 
         <div className="space-y-2">
