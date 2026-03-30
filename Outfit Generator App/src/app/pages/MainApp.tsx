@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { pics } from '../../pics';
+import Shopping from './Shopping';
 
 // Sample wardrobe data
 const sampleWardrobe: ClothingItem[] = [
@@ -346,11 +347,12 @@ export function MainApp() {
         </div>
 
         <Tabs defaultValue="quick" className="space-y-6">
-          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-4">
+          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5">
             <TabsTrigger value="quick">Quick Outfit</TabsTrigger>
             <TabsTrigger value="plan">Plan Ahead</TabsTrigger>
             <TabsTrigger value="style">Style an Item</TabsTrigger>
             <TabsTrigger value="wardrobe">Wardrobe</TabsTrigger>
+            <TabsTrigger value="shop">Shop</TabsTrigger>
           </TabsList>
 
           <TabsContent value="quick" className="space-y-6">
@@ -416,6 +418,10 @@ export function MainApp() {
               onAddItem={handleAddItem}
               onRemoveItem={handleRemoveItem}
             />
+          </TabsContent>
+
+          <TabsContent value="shop">
+            <Shopping />
           </TabsContent>
         </Tabs>
       </div>

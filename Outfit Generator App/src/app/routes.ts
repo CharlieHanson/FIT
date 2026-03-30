@@ -3,6 +3,7 @@ import { Login } from './pages/Login';
 import { Onboarding } from './pages/Onboarding';
 import { UploadOutfits } from './pages/UploadOutfits';
 import { MainApp } from './pages/MainApp';
+import Shopping from './pages/Shopping';
 
 export const router = createBrowserRouter([
   {
@@ -20,5 +21,9 @@ export const router = createBrowserRouter([
   {
     path: '/app',
     Component: MainApp,
+  },
+  {
+    path: '/shopping',
+    Component: Shopping,
   },
 ]);
