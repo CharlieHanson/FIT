@@ -4,27 +4,11 @@ import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
+import { Product } from "../types/product";
 
 interface Category {
   label: string;
   query: string;
-}
-
-interface ProductOffer {
-  price?: string;
-  store_name?: string;
-  offer_page_url?: string;
-}
-
-interface Product {
-  product_id?: string;
-  product_title: string;
-  product_photo?: string;
-  product_photos?: string[];
-  product_page_url?: string;
-  product_source?: string;
-  typical_price_range?: string[];
-  offer?: ProductOffer;
 }
 
 interface ProductCardProps {
@@ -83,7 +67,6 @@ export default function Shopping() {
 
   return (
     <div className="space-y-6">
-      {/* Search + category bar */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <form onSubmit={handleSearch} className="flex gap-2 w-full sm:w-auto">
           <Input
@@ -119,7 +102,6 @@ export default function Shopping() {
         </div>
       </div>
 
-      {/* States */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-purple-200 border-t-purple-600 animate-spin" />
@@ -139,7 +121,6 @@ export default function Shopping() {
         </div>
       )}
 
-      {/* Grid */}
       {!loading && !error && products.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {products.map((product, i) => (
@@ -170,7 +151,6 @@ function ProductCard({ product }: ProductCardProps) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
       <Card className="overflow-hidden h-full transition-shadow hover:shadow-md">
-        {/* Image */}
         <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
           {image ? (
             <img
@@ -198,7 +178,6 @@ function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Info */}
         <CardContent className="p-3">
           <p className="text-xs text-gray-800 leading-snug line-clamp-2 mb-2">
             {product.product_title}
