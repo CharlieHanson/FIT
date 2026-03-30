@@ -61,7 +61,7 @@ export function OutfitGeneratorEnhanced({
       setShowAlert(false);
 
       setProductLoading(true);
-      const query = buildComplementQuery(outfits[0], plan);
+      const query = buildComplementQuery(outfits[0], plan, anchorItem);
       const product = await fetchProductSuggestion(query);
       setSuggestedProduct(product);
       setProductLoading(false);
