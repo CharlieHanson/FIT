@@ -3,12 +3,17 @@ import { Login } from './pages/Login';
 import { Onboarding } from './pages/Onboarding';
 import { UploadOutfits } from './pages/UploadOutfits';
 import { MainApp } from './pages/MainApp';
+import { AuthCallback } from './pages/AuthCallback';
 import Shopping from './pages/Shopping';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     Component: Login,
+  },
+  {
+    path: '/auth/callback',
+    Component: AuthCallback,
   },
   {
     path: '/onboarding',

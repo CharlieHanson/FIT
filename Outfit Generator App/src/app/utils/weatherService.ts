@@ -1,10 +1,12 @@
 import { Weather } from '../types/wardrobe';
 
-const RENDER_BASE_URL = 'https://f-it.onrender.com'; 
+const API_BASE_URL = 'https://f-it.onrender.com'; 
 
 export async function fetchWeatherCategory(): Promise<Weather> {
   try {
-    const res = await fetch(`${RENDER_BASE_URL}/weather`);
+    const res = await fetch(`${API_BASE_URL}/weather`, {
+      credentials: 'include', // Include cookies for session
+    });
     const data = await res.json();
 
     if (!data.success) return 'warm'; // fallback
