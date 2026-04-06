@@ -262,54 +262,127 @@ export function MainApp() {
   const [unavailableItems, setUnavailableItems] = useState<string[]>([]);
   const [anchorItem, setAnchorItem] = useState<ClothingItem | undefined>();
   const [userEmail, setUserEmail] = useState('');
+  const [isLoadingWardrobe, setIsLoadingWardrobe] = useState(true);
 
   useEffect(() => {
-    // Check authentication
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    if (!isAuthenticated) {
-      navigate('/');
+    const loadUserData = async () => {
+      // Check authentication
+      const isAuthenticated = localStorage.getItem('isAuthenticated');
+      if (!isAuthenticated) {
+        navigate('/');
+        return;
+      }
+
+      // Get user email and ID
+      const email = localStorage.getItem('userEmail');
+      const userID = localStorage.getItem('userID');
+      
+      if (email) {
+        setUserEmail(email);
+      }
+
+      // If this is the demo account, use sample data
+      if (userID === 'demo-user-123') {
+        setWardrobe(sampleWardrobe);
+        setIsLoadingWardrobe(false);
+        return;
+      }
+
+      // Fetch user's wardrobe from backend
+      if (userID) {
+        try {
+          setIsLoadingWardrobe(true);
+          const items = await api.user.getAllWardrobe(userID);
+          
+          if (items.length > 0) {
+            setWardrobe(items);
+          } else {
+            // No items yet, show empty wardrobe
+            setWardrobe([]);
+          }
+        } catch (error) {
+          console.error('Failed to load wardrobe:', error);
+          // Fallback to empty wardrobe on error
+          setWardrobe([]);
+        } finally {
+          setIsLoadingWardrobe(false);
+        }
+      } else {
+        setIsLoadingWardrobe(false);
+      }
+    };
+
+    loadUserData();
+  }, [navigate]);
+
+
+  const handleAddItem = async (item: Omit<ClothingItem, 'id'>) => {
+    const userID = localStorage.getItem('userID');
+    
+    // If demo user, just add locally
+    if (userID === 'demo-user-123') {
+      const newItem: ClothingItem = {
+        ...item,
+        id: Date.now().toString(),
+      };
+      setWardrobe([...wardrobe, newItem]);
       return;
     }
 
-    // Get user email
-    const email = localStorage.getItem('userEmail');
-    if (email) {
-      setUserEmail(email);
-    }
+    // For real users, add to backend
+    if (userID) {
+      try {
+        // Map frontend item format to backend format
+        const backendItem = {
+          analysis: {
+            name: item.name,
+            category: item.category === 'tops' ? 'shirt' : 
+                     item.category === 'bottoms' ? 'pants' : 
+                     item.category === 'shoes' ? 'shoe' : 
+                     item.category,
+            colors: item.colors,
+            styles: item.style,
+            minTemp: 0,  // Default values
+            maxTemp: 100,
+          },
+          imageUrl: item.imageUrl || '',
+        };
 
-    // Load wardrobe from localStorage or use sample data
-    const savedWardrobe = localStorage.getItem('wardrobe');
-    if (savedWardrobe) {
-      const parsed = JSON.parse(savedWardrobe);
-      // If saved wardrobe has fewer items than sample, update to new sample
-      if (parsed.length < sampleWardrobe.length) {
-        setWardrobe(sampleWardrobe);
-        localStorage.setItem('wardrobe', JSON.stringify(sampleWardrobe));
-      } else {
-        setWardrobe(parsed);
+        const response = await api.user.addItem(userID, backendItem);
+        
+        if (response.success) {
+          // Refresh wardrobe from backend
+          const updatedWardrobe = await api.user.getAllWardrobe(userID);
+          setWardrobe(updatedWardrobe);
+        }
+      } catch (error) {
+        console.error('Failed to add item:', error);
       }
-    } else {
-      setWardrobe(sampleWardrobe);
     }
-  }, [navigate]);
-
-  useEffect(() => {
-    // Save wardrobe to localStorage whenever it changes
-    if (wardrobe.length > 0) {
-      localStorage.setItem('wardrobe', JSON.stringify(wardrobe));
-    }
-  }, [wardrobe]);
-
-  const handleAddItem = (item: Omit<ClothingItem, 'id'>) => {
-    const newItem: ClothingItem = {
-      ...item,
-      id: Date.now().toString(),
-    };
-    setWardrobe([...wardrobe, newItem]);
   };
 
-  const handleRemoveItem = (id: string) => {
-    setWardrobe(wardrobe.filter(item => item.id !== id));
+  const handleRemoveItem = async (id: string) => {
+    const userID = localStorage.getItem('userID');
+    
+    // If demo user, just remove locally
+    if (userID === 'demo-user-123') {
+      setWardrobe(wardrobe.filter(item => item.id !== id));
+      return;
+    }
+
+    // For real users, delete from backend
+    if (userID) {
+      try {
+        const response = await api.user.deleteItem(userID, id);
+        
+        if (response.success) {
+          // Remove from local state
+          setWardrobe(wardrobe.filter(item => item.id !== id));
+        }
+      } catch (error) {
+        console.error('Failed to remove item:', error);
+      }
+    }
   };
 
   const handleLogout = async () => {
@@ -355,14 +428,22 @@ export function MainApp() {
           </div>
         </div>
 
-        <Tabs defaultValue="quick" className="space-y-6">
-          <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5">
-            <TabsTrigger value="quick">Quick Outfit</TabsTrigger>
-            <TabsTrigger value="plan">Plan Ahead</TabsTrigger>
-            <TabsTrigger value="style">Style an Item</TabsTrigger>
-            <TabsTrigger value="wardrobe">Wardrobe</TabsTrigger>
-            <TabsTrigger value="shop">Shop</TabsTrigger>
-          </TabsList>
+        {isLoadingWardrobe ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center space-y-4">
+              <div className="w-12 h-12 rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin mx-auto" />
+              <p className="text-gray-600">Loading your wardrobe...</p>
+            </div>
+          </div>
+        ) : (
+          <Tabs defaultValue="quick" className="space-y-6">
+            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5">
+              <TabsTrigger value="quick">Quick Outfit</TabsTrigger>
+              <TabsTrigger value="plan">Plan Ahead</TabsTrigger>
+              <TabsTrigger value="style">Style an Item</TabsTrigger>
+              <TabsTrigger value="wardrobe">Wardrobe</TabsTrigger>
+              <TabsTrigger value="shop">Shop</TabsTrigger>
+            </TabsList>
 
           <TabsContent value="quick" className="space-y-6">
             <Card>
@@ -433,6 +514,7 @@ export function MainApp() {
             <Shopping />
           </TabsContent>
         </Tabs>
+        )}
       </div>
     </div>
   );

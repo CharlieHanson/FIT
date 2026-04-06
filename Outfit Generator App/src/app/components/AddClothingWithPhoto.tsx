@@ -58,8 +58,12 @@ export function AddClothingWithPhoto({ onAddItem }: AddClothingWithPhotoProps) {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPhoto(url);
+      // Convert file to base64 data URL so it can be saved to backend
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
