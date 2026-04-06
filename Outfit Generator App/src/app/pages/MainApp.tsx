@@ -10,6 +10,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { pics } from '../../pics';
 import Shopping from './Shopping';
+import { api } from '../services/api';
 
 // Sample wardrobe data
 const sampleWardrobe: ClothingItem[] = [
@@ -311,9 +312,17 @@ export function MainApp() {
     setWardrobe(wardrobe.filter(item => item.id !== id));
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Call backend logout endpoint
+    await api.auth.logout();
+    
+    // Clear local storage
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userID');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('authToken');
+    
     navigate('/');
   };
 
