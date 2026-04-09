@@ -371,17 +371,49 @@ export function MainApp() {
     }
 
     // For real users, delete from backend
-    if (userID) {
-      try {
-        const response = await api.user.deleteItem(userID, id);
-        
-        if (response.success) {
-          // Remove from local state
-          setWardrobe(wardrobe.filter(item => item.id !== id));
-        }
-      } catch (error) {
-        console.error('Failed to remove item:', error);
+    try {
+      const response = await api.user.deleteItem(id);
+      
+      if (response.success) {
+        // Remove from local state
+        setWardrobe(wardrobe.filter(item => item.id !== id));
       }
+    } catch (error) {
+      console.error('Failed to remove item:', error);
+    }
+  };
+
+  const handleUnavailableChange = async (itemIds: string[]) => {
+    const userID = localStorage.getItem('userID');
+    
+    // Update local state immediately for better UX
+    const previousUnavailable = unavailableItems;
+    setUnavailableItems(itemIds);
+
+    // If demo user, just update locally
+    if (userID === 'demo-user-123') {
+      return;
+    }
+
+    // For real users, sync with backend
+    try {
+      // Find which items were added or removed
+      const added = itemIds.filter(id => !previousUnavailable.includes(id));
+      const removed = previousUnavailable.filter(id => !itemIds.includes(id));
+
+      // Mark items as unavailable
+      for (const itemId of added) {
+        await api.user.markUnavailable(itemId);
+      }
+
+      // Mark items as available
+      for (const itemId of removed) {
+        await api.user.markAvailable(itemId);
+      }
+    } catch (error) {
+      console.error('Failed to update item availability:', error);
+      // Revert on error
+      setUnavailableItems(previousUnavailable);
     }
   };
 
@@ -457,7 +489,7 @@ export function MainApp() {
                 <WardrobeSelector
                   wardrobe={wardrobe}
                   unavailableItems={unavailableItems}
-                  onUnavailableChange={setUnavailableItems}
+                  onUnavailableChange={handleUnavailableChange}
                   mode="unavailable"
                 />
               </CardContent>

@@ -118,10 +118,43 @@ export const api = {
     },
 
     // Delete item from wardrobe
-    deleteItem: async (userID: string, itemID: string) => {
-      const response = await fetch(`${API_BASE_URL}/user/${userID}/item/${itemID}`, {
+    deleteItem: async (itemID: string) => {
+      const response = await fetch(`${API_BASE_URL}/delete_item/${itemID}`, {
         method: 'DELETE',
         credentials: 'include',
+      });
+      return response.json();
+    },
+
+    // Mark item as available
+    markAvailable: async (itemID: string) => {
+      const response = await fetch(`${API_BASE_URL}/mark_available/${itemID}`, {
+        method: 'PUT',
+        credentials: 'include',
+      });
+      return response.json();
+    },
+
+    // Mark item as unavailable (toggle availability)
+    markUnavailable: async (itemID: string) => {
+      // Note: Backend needs a /mark_unavailable endpoint
+      // For now, we'll use mark_available with a flag or handle locally
+      const response = await fetch(`${API_BASE_URL}/mark_unavailable/${itemID}`, {
+        method: 'PUT',
+        credentials: 'include',
+      });
+      return response.json();
+    },
+
+    // Analyze clothing image with AI
+    analyzeImage: async (userID: string, imageBase64: string) => {
+      const response = await fetch(`${API_BASE_URL}/analyzeimage/${userID}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ imagePath: imageBase64 }),
       });
       return response.json();
     },
