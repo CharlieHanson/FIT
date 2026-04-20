@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { pics } from '../../pics';
 import Shopping from './Shopping';
 import { api } from '../services/api';
+import { UserPreferences } from '../utils/personalizedSearch';
 
 // Sample wardrobe data
 const sampleWardrobe: ClothingItem[] = [
@@ -270,6 +271,11 @@ export function MainApp() {
   const [userGender, setUserGender] = useState<string>('');
   const [isLoadingWardrobe, setIsLoadingWardrobe] = useState(true);
   const [activeTab, setActiveTab] = useState('quick');
+  const userPrefs: UserPreferences = {
+    gender: userGender,
+    favoriteStyles: favoriteStyles,
+    favoriteColors: favoriteColors,
+  };
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -594,6 +600,7 @@ export function MainApp() {
               wardrobe={wardrobe}
               unavailableItems={unavailableItems}
               anchorItem={undefined}
+              userPrefs={userPrefs}
             />
           </TabsContent>
 
@@ -610,6 +617,7 @@ export function MainApp() {
                 wardrobe={wardrobe}
                 unavailableItems={unavailableItems}
                 anchorItem={anchorItem}
+                userPrefs={userPrefs}
               />
             )}
           </TabsContent>
@@ -619,11 +627,12 @@ export function MainApp() {
               wardrobe={wardrobe}
               onAddItem={handleAddItem}
               onRemoveItem={handleRemoveItem}
+              userPrefs={userPrefs}
             />
           </TabsContent>
 
           <TabsContent value="shop">
-            <Shopping />
+            <Shopping userPrefs={userPrefs} />
           </TabsContent>
 
           <TabsContent value="profile">

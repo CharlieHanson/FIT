@@ -5,32 +5,42 @@ import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
 import { Product } from "../types/product";
+import { UserPreferences, buildPersonalizedQuery } from "../utils/personalizedSearch";
 
 interface Category {
   label: string;
   query: string;
 }
 
+interface ShoppingProps {
+  userPrefs: UserPreferences;
+}
+
 interface ProductCardProps {
   product: Product;
 }
 
-const CATEGORIES: Category[] = [
-  { label: "All", query: "men's streetwear clothing" },
-  { label: "Tops", query: "men's graphic tees hoodies" },
-  { label: "Bottoms", query: "men's cargo pants slim jeans" },
-  { label: "Footwear", query: "men's sneakers shoes" },
-  { label: "Outerwear", query: "men's jackets bombers" },
-  { label: "Accessories", query: "men's caps bags accessories" },
-];
+function buildCategories(prefs: UserPreferences): Category[] {
+  const p = (category: string, extra?: string) => buildPersonalizedQuery(category, prefs, extra);
+  return [
+    { label: "All",        query: p("clothing") },
+    { label: "Tops",       query: p("shirts tops") },
+    { label: "Bottoms",    query: p("pants jeans") },
+    { label: "Footwear",   query: p("sneakers shoes") },
+    { label: "Outerwear",  query: p("jackets coats") },
+    { label: "Accessories",query: p("accessories bags") },
+  ];
+}
 
-export default function Shopping() {
+export default function Shopping({ userPrefs }: ShoppingProps) {
   const [activeCategory, setActiveCategory] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const categories = buildCategories(userPrefs);
 
   const fetchProducts = async (query: string): Promise<void> => {
     setLoading(true);
@@ -55,9 +65,9 @@ export default function Shopping() {
   };
 
   useEffect(() => {
-    const query = searchQuery || CATEGORIES[activeCategory].query;
+    const query = searchQuery || categories[activeCategory].query;
     fetchProducts(query);
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, userPrefs]);
 
   const handleSearch = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -82,7 +92,7 @@ export default function Shopping() {
         </form>
 
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat, i) => (
+          {categories.map((cat, i) => (
             <button
               key={cat.label}
               onClick={() => {
@@ -108,19 +118,16 @@ export default function Shopping() {
           <p className="text-sm text-gray-500">Loading products...</p>
         </div>
       )}
-
       {error && !loading && (
         <div className="flex items-center justify-center py-20">
           <p className="text-sm text-red-500">{error}</p>
         </div>
       )}
-
       {!loading && !error && products.length === 0 && (
         <div className="flex items-center justify-center py-20">
           <p className="text-sm text-gray-400">No results found.</p>
         </div>
       )}
-
       {!loading && !error && products.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {products.map((product, i) => (
@@ -133,19 +140,9 @@ export default function Shopping() {
 }
 
 function ProductCard({ product }: ProductCardProps) {
-  const price: string =
-    product.offer?.price ??
-    product.typical_price_range?.[0] ??
-    "—";
-
-  const image: string | null =
-    product.product_photos?.[0] ??
-    product.product_photo ??
-    null;
-
-  const retailer: string =
-    product.offer?.store_name ?? product.product_source ?? "";
-
+  const price = product.offer?.price ?? product.typical_price_range?.[0] ?? "—";
+  const image = product.product_photos?.[0] ?? product.product_photo ?? null;
+  const retailer = product.offer?.store_name ?? product.product_source ?? "";
   const href = product.offer?.offer_page_url ?? product.product_page_url ?? "#";
 
   return (
@@ -159,15 +156,10 @@ function ProductCard({ product }: ProductCardProps) {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-3xl">
-              👕
-            </div>
+            <div className="w-full h-full flex items-center justify-center text-3xl">👕</div>
           )}
           {retailer && (
-            <Badge
-              variant="secondary"
-              className="absolute top-2 left-2 text-xs opacity-90"
-            >
+            <Badge variant="secondary" className="absolute top-2 left-2 text-xs opacity-90">
               {retailer}
             </Badge>
           )}
@@ -177,11 +169,8 @@ function ProductCard({ product }: ProductCardProps) {
             </div>
           </div>
         </div>
-
         <CardContent className="p-3">
-          <p className="text-xs text-gray-800 leading-snug line-clamp-2 mb-2">
-            {product.product_title}
-          </p>
+          <p className="text-xs text-gray-800 leading-snug line-clamp-2 mb-2">{product.product_title}</p>
           <p className="text-sm font-semibold text-purple-600">{price}</p>
         </CardContent>
       </Card>

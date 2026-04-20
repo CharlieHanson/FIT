@@ -3,6 +3,7 @@ import { Plus, Trash2, ExternalLink, ShoppingBag, Loader2 } from 'lucide-react';
 import { ClothingItem, ClothingCategory, EventType, Color } from '../types/wardrobe';
 import { Product } from '../types/product';
 import { fetchComplementProducts } from '../utils/productSearch';
+import { UserPreferences } from '../utils/personalizedSearch';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -18,6 +19,7 @@ interface WardrobeManagerProps {
   wardrobe: ClothingItem[];
   onAddItem: (item: Omit<ClothingItem, 'id'>) => void;
   onRemoveItem: (id: string) => void;
+  userPrefs: UserPreferences;
 }
 
 const categories: { value: ClothingCategory; label: string }[] = [
@@ -54,14 +56,13 @@ const colors: { value: Color; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
-export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeManagerProps) {
+export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem, userPrefs }: WardrobeManagerProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [category, setCategory] = useState<ClothingCategory>('tops');
   const [selectedColors, setSelectedColors] = useState<Color[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<EventType[]>([]);
 
-  // Shopping suggestions state
   const [shopDialogOpen, setShopDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null);
   const [shopProducts, setShopProducts] = useState<Product[]>([]);
@@ -100,7 +101,7 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
     setShopDialogOpen(true);
     setShopProducts([]);
     setShopLoading(true);
-    const products = await fetchComplementProducts(item, 4);
+    const products = await fetchComplementProducts(item, userPrefs, 4);
     setShopProducts(products);
     setShopLoading(false);
   };
@@ -171,10 +172,7 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
                           checked={selectedColors.includes(color.value)}
                           onCheckedChange={() => toggleColor(color.value)}
                         />
-                        <label
-                          htmlFor={`color-${color.value}`}
-                          className="text-sm cursor-pointer"
-                        >
+                        <label htmlFor={`color-${color.value}`} className="text-sm cursor-pointer">
                           {color.label}
                         </label>
                       </div>
@@ -192,10 +190,7 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
                           checked={selectedStyles.includes(event.value)}
                           onCheckedChange={() => toggleStyle(event.value)}
                         />
-                        <label
-                          htmlFor={`style-${event.value}`}
-                          className="text-sm cursor-pointer"
-                        >
+                        <label htmlFor={`style-${event.value}`} className="text-sm cursor-pointer">
                           {event.label}
                         </label>
                       </div>
@@ -283,7 +278,6 @@ export function WardrobeManager({ wardrobe, onAddItem, onRemoveItem }: WardrobeM
         ))}
       </div>
 
-      {/* Shopping suggestions dialog */}
       <Dialog open={shopDialogOpen} onOpenChange={setShopDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>

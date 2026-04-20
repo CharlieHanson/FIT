@@ -15,17 +15,20 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
+import { UserPreferences } from '../utils/personalizedSearch';
 
 interface OutfitGeneratorEnhancedProps {
   wardrobe: ClothingItem[];
   unavailableItems: string[];
   anchorItem?: ClothingItem;
+  userPrefs: UserPreferences;
 }
 
 export function OutfitGeneratorEnhanced({
   wardrobe,
   unavailableItems,
   anchorItem,
+  userPrefs,
 }: OutfitGeneratorEnhancedProps) {
   const [generatedOutfits, setGeneratedOutfits] = useState<Outfit[]>([]);
   const [showAlert, setShowAlert] = useState(false);
@@ -61,7 +64,7 @@ export function OutfitGeneratorEnhanced({
       setShowAlert(false);
 
       setProductLoading(true);
-      const query = buildComplementQuery(outfits[0], plan, anchorItem);
+      const query = buildComplementQuery(outfits[0], plan, userPrefs, anchorItem);
       const product = await fetchProductSuggestion(query);
       setSuggestedProduct(product);
       setProductLoading(false);
