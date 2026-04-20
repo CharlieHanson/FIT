@@ -171,10 +171,7 @@ export function OutfitGeneratorEnhanced({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <OutfitDisplay
-                outfits={generatedOutfits}
-                onSaveToCalendar={handleSaveToCalendar}
-              />
+              <OutfitDisplay outfits={generatedOutfits} />
             </div>
 
             <div>
