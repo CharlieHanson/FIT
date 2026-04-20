@@ -4,11 +4,12 @@ const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'https://f-it.onr
 function mapBackendItemToClothingItem(backendItem: any): any {
   // Map backend Type to frontend category
   const typeToCategory: Record<string, string> = {
-    'shirt': 'tops',
-    'pants': 'bottoms',
+    'top': 'tops',
+    'bottom': 'bottoms',
     'shoe': 'shoes',
-    'outerwear': 'outerwear',
+    'coat': 'outerwear',
     'accessory': 'accessories',
+    'umbrella': 'accessories',
   };
 
   return {
@@ -56,13 +57,44 @@ export const api = {
       favorite_colors?: string[];
       favorite_styles?: string[];
     }) => {
+      // Server expects 'colors' and 'styles', not 'favorite_colors' and 'favorite_styles'
+      const body = {
+        colors: preferences.favorite_colors,
+        styles: preferences.favorite_styles,
+      };
       const response = await fetch(`${API_BASE_URL}/user/${userID}/preferences`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(preferences),
+        body: JSON.stringify(body),
+      });
+      return response.json();
+    },
+
+    getProfile: async (userID: string) => {
+      const response = await fetch(`${API_BASE_URL}/user/${userID}/profile`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      return response.json();
+    },
+
+    updateProfile: async (userID: string, profileData: {
+      name?: string;
+      photo?: string;
+      favorite_colors?: string;
+      favorite_styles?: string;
+      gender?: string;
+    }) => {
+      const response = await fetch(`${API_BASE_URL}/user/${userID}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(profileData),
       });
       return response.json();
     },
@@ -78,21 +110,21 @@ export const api = {
     // Fetch all wardrobe items for a user
     getAllWardrobe: async (userID: string) => {
       try {
-        // Fetch all clothing types in parallel
-        const [shirtsRes, pantsRes, shoesRes, outerwearRes, accessoriesRes] = await Promise.all([
-          api.user.getWardrobeByType(userID, 'shirt'),
-          api.user.getWardrobeByType(userID, 'pants'),
+        // Fetch all clothing types in parallel - using server's type names
+        const [topsRes, bottomsRes, shoesRes, coatsRes, accessoriesRes] = await Promise.all([
+          api.user.getWardrobeByType(userID, 'top'),
+          api.user.getWardrobeByType(userID, 'bottom'),
           api.user.getWardrobeByType(userID, 'shoe'),
-          api.user.getWardrobeByType(userID, 'outerwear'),
+          api.user.getWardrobeByType(userID, 'coat'),
           api.user.getWardrobeByType(userID, 'accessory'),
         ]);
 
         // Backend returns items in a 'shirts' property for all types
         const backendItems = [
-          ...(shirtsRes.shirts || []),
-          ...(pantsRes.shirts || []),
+          ...(topsRes.shirts || []),
+          ...(bottomsRes.shirts || []),
           ...(shoesRes.shirts || []),
-          ...(outerwearRes.shirts || []),
+          ...(coatsRes.shirts || []),
           ...(accessoriesRes.shirts || []),
         ];
 
@@ -169,12 +201,28 @@ export const api = {
       });
       return response.json();
     },
+
+    getWeather: async () => {
+      const response = await fetch(`${API_BASE_URL}/weather`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      return response.json();
+    },
   },
 
   // Outfit generation
   outfit: {
     generate: async (userID: string, style: string) => {
       const response = await fetch(`${API_BASE_URL}/generateOutfit/${userID}/${style}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      return response.json();
+    },
+
+    styleAnItem: async (userID: string, itemID: string) => {
+      const response = await fetch(`${API_BASE_URL}/styleAnItem/${userID}/${itemID}`, {
         method: 'GET',
         credentials: 'include',
       });

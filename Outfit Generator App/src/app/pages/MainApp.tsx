@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Sparkles, LogOut, Calendar as CalendarIcon } from 'lucide-react';
+import { Sparkles, LogOut, Calendar as CalendarIcon, User } from 'lucide-react';
 import { ClothingItem, DailyPlan, Outfit } from '../types/wardrobe';
 import { WardrobeManager } from '../components/WardrobeManager';
 import { OutfitGeneratorEnhanced } from '../components/OutfitGeneratorEnhanced';
 import { WardrobeSelector } from '../components/WardrobeSelector';
+import { ProfileSettings } from '../components/ProfileSettings';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -262,7 +263,13 @@ export function MainApp() {
   const [unavailableItems, setUnavailableItems] = useState<string[]>([]);
   const [anchorItem, setAnchorItem] = useState<ClothingItem | undefined>();
   const [userEmail, setUserEmail] = useState('');
+  const [userName, setUserName] = useState('');
+  const [userPhoto, setUserPhoto] = useState('');
+  const [favoriteColors, setFavoriteColors] = useState<string[]>([]);
+  const [favoriteStyles, setFavoriteStyles] = useState<string[]>([]);
+  const [userGender, setUserGender] = useState<string>('');
   const [isLoadingWardrobe, setIsLoadingWardrobe] = useState(true);
+  const [activeTab, setActiveTab] = useState('quick');
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -275,10 +282,18 @@ export function MainApp() {
 
       // Get user email and ID
       const email = localStorage.getItem('userEmail');
+      const name = localStorage.getItem('userName');
+      const photo = localStorage.getItem('userPhoto');
       const userID = localStorage.getItem('userID');
       
       if (email) {
         setUserEmail(email);
+      }
+      if (name) {
+        setUserName(name);
+      }
+      if (photo) {
+        setUserPhoto(photo);
       }
 
       // If this is the demo account, use sample data
@@ -288,17 +303,45 @@ export function MainApp() {
         return;
       }
 
-      // Fetch user's wardrobe from backend
+      // Fetch user's wardrobe and profile from backend
       if (userID) {
         try {
           setIsLoadingWardrobe(true);
-          const items = await api.user.getAllWardrobe(userID);
           
+          // Fetch wardrobe
+          const items = await api.user.getAllWardrobe(userID);
           if (items.length > 0) {
             setWardrobe(items);
           } else {
-            // No items yet, show empty wardrobe
             setWardrobe([]);
+          }
+
+          // Fetch user profile
+          const profileResponse = await api.user.getProfile(userID);
+          if (profileResponse.success && profileResponse.profile) {
+            const profile = profileResponse.profile;
+            setUserEmail(profile.email || email || '');
+            setUserName(profile.name || name || '');
+            setUserPhoto(profile.photo || photo || '');
+            
+            // Parse favorite colors and styles (they're stored as comma-separated strings)
+            if (profile.favorite_colors) {
+              const colors = typeof profile.favorite_colors === 'string' 
+                ? profile.favorite_colors.split(',').map((c: string) => c.trim())
+                : profile.favorite_colors;
+              setFavoriteColors(colors);
+            }
+            
+            if (profile.favorite_styles) {
+              const styles = typeof profile.favorite_styles === 'string'
+                ? profile.favorite_styles.split(',').map((s: string) => s.trim())
+                : profile.favorite_styles;
+              setFavoriteStyles(styles);
+            }
+            
+            if (profile.gender) {
+              setUserGender(profile.gender);
+            }
           }
         } catch (error) {
           console.error('Failed to load wardrobe:', error);
@@ -336,9 +379,11 @@ export function MainApp() {
         const backendItem = {
           analysis: {
             name: item.name,
-            category: item.category === 'tops' ? 'shirt' : 
-                     item.category === 'bottoms' ? 'pants' : 
+            category: item.category === 'tops' ? 'top' : 
+                     item.category === 'bottoms' ? 'bottom' : 
                      item.category === 'shoes' ? 'shoe' : 
+                     item.category === 'outerwear' ? 'coat' : 
+                     item.category === 'accessories' ? 'accessory' : 
                      item.category,
             colors: item.colors,
             styles: item.style,
@@ -426,9 +471,45 @@ export function MainApp() {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userID');
     localStorage.removeItem('userName');
+    localStorage.removeItem('userPhoto');
     localStorage.removeItem('authToken');
     
     navigate('/');
+  };
+
+  const handleSaveProfile = async (data: { name: string; colors: string[]; styles: string[]; gender: string }) => {
+    try {
+      const userID = localStorage.getItem('userID');
+      
+      // Update local state
+      setUserName(data.name);
+      setFavoriteColors(data.colors);
+      setFavoriteStyles(data.styles);
+      setUserGender(data.gender);
+      localStorage.setItem('userName', data.name);
+      
+      // If not demo user, save to backend
+      if (userID && userID !== 'demo-user-123') {
+        const response = await api.user.updateProfile(userID, {
+          name: data.name,
+          favorite_colors: data.colors.join(','),
+          favorite_styles: data.styles.join(','),
+          gender: data.gender,
+        });
+        
+        if (response.success) {
+          alert('Profile updated successfully!');
+        } else {
+          throw new Error(response.error || 'Failed to update profile');
+        }
+      } else {
+        // Demo user - just show success
+        alert('Profile updated successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      alert('Failed to save profile. Please try again.');
+    }
   };
 
   return (
@@ -448,10 +529,24 @@ export function MainApp() {
                 Smart outfit suggestions based on your wardrobe and daily plans
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm text-gray-600">{userEmail}</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setActiveTab('profile')}
+                className="flex items-center gap-2"
+              >
+                {userPhoto ? (
+                  <img 
+                    src={userPhoto} 
+                    alt={userName || 'User'} 
+                    className="w-5 h-5 rounded-full object-cover"
+                  />
+                ) : (
+                  <User className="w-4 h-4" />
+                )}
+                Profile
+              </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -468,14 +563,15 @@ export function MainApp() {
             </div>
           </div>
         ) : (
-          <Tabs defaultValue="quick" className="space-y-6">
-            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-5">
-              <TabsTrigger value="quick">Quick Outfit</TabsTrigger>
-              <TabsTrigger value="plan">Plan Ahead</TabsTrigger>
-              <TabsTrigger value="style">Style an Item</TabsTrigger>
-              <TabsTrigger value="wardrobe">Wardrobe</TabsTrigger>
-              <TabsTrigger value="shop">Shop</TabsTrigger>
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            {activeTab !== 'profile' && (
+              <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4">
+                <TabsTrigger value="quick">Quick Outfit</TabsTrigger>
+                <TabsTrigger value="style">Style an Item</TabsTrigger>
+                <TabsTrigger value="wardrobe">Wardrobe</TabsTrigger>
+                <TabsTrigger value="shop">Shop</TabsTrigger>
+              </TabsList>
+            )}
 
           <TabsContent value="quick" className="space-y-6">
             <Card>
@@ -497,22 +593,6 @@ export function MainApp() {
             <OutfitGeneratorEnhanced
               wardrobe={wardrobe}
               unavailableItems={unavailableItems}
-              anchorItem={undefined}
-            />
-          </TabsContent>
-
-          <TabsContent value="plan" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Plan an Outfit for Later</CardTitle>
-                <CardDescription>
-                  Generate outfits and save them to your calendar
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <OutfitGeneratorEnhanced
-              wardrobe={wardrobe}
-              unavailableItems={[]}
               anchorItem={undefined}
             />
           </TabsContent>
@@ -544,6 +624,19 @@ export function MainApp() {
 
           <TabsContent value="shop">
             <Shopping />
+          </TabsContent>
+
+          <TabsContent value="profile">
+            <ProfileSettings
+              userEmail={userEmail}
+              userName={userName}
+              userPhoto={userPhoto}
+              initialColors={favoriteColors}
+              initialStyles={favoriteStyles}
+              initialGender={userGender}
+              onSave={handleSaveProfile}
+              onBack={() => setActiveTab('quick')}
+            />
           </TabsContent>
         </Tabs>
         )}

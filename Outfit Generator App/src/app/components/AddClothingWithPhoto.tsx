@@ -101,15 +101,17 @@ export function AddClothingWithPhoto({ onAddItem }: AddClothingWithPhotoProps) {
           
           // Map backend category to frontend category
           const categoryMap: Record<string, ClothingCategory> = {
+            'top': 'tops',
             'tops': 'tops',
-            'shirt': 'tops',
+            'bottom': 'bottoms',
             'bottoms': 'bottoms',
-            'pants': 'bottoms',
-            'shoes': 'shoes',
             'shoe': 'shoes',
+            'shoes': 'shoes',
+            'coat': 'outerwear',
             'outerwear': 'outerwear',
-            'accessories': 'accessories',
             'accessory': 'accessories',
+            'accessories': 'accessories',
+            'umbrella': 'accessories',
           };
 
           // Add the item with AI analysis
