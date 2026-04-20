@@ -124,6 +124,7 @@ export function AddClothingWithPhoto({ onAddItem }: AddClothingWithPhotoProps) {
           });
 
           // Reset and close
+          setIsAnalyzing(false);
           setPhoto(null);
           setOpen(false);
         } else {
