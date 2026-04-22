@@ -120,6 +120,9 @@ export function AddClothingWithPhoto({ onAddItem }: AddClothingWithPhotoProps) {
             category: categoryMap[analysis.category] || 'tops',
             colors: analysis.colors.map((c: string) => c.toLowerCase() as Color),
             style: analysis.styles.map((s: string) => s.toLowerCase() as EventType),
+            styles2: analysis.styles2?.map((s: string) => s.toLowerCase()) ?? [],
+            minTemp: analysis.minTemp,
+            maxTemp: analysis.maxTemp,
             imageUrl: base64Image,
           });
 
