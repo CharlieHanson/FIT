@@ -13,9 +13,9 @@ export interface ClothingItem {
   category: ClothingCategory;
   colors: Color[];
   style: EventType[];
-  styles2: Style2[];
-  minTemp: number;
-  maxTemp: number;
+  styles2?: Style2[];
+  minTemp?: number;
+  maxTemp?: number;
   imageUrl?: string;
 }
 

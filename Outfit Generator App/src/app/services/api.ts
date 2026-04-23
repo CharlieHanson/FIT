@@ -12,12 +12,25 @@ function mapBackendItemToClothingItem(backendItem: any): any {
     'umbrella': 'accessories',
   };
 
+  const rawStyles2 = backendItem.Styles2 ?? backendItem.styles2;
+  const styles2 = typeof rawStyles2 === 'string'
+    ? rawStyles2.split(',').map((s: string) => s.trim().toLowerCase()).filter(Boolean)
+    : Array.isArray(rawStyles2)
+      ? rawStyles2.map((s: string) => s.toLowerCase())
+      : undefined;
+
+  const minTemp = backendItem.MinTemp ?? backendItem.minTemp;
+  const maxTemp = backendItem.MaxTemp ?? backendItem.maxTemp;
+
   return {
     id: backendItem.IID?.toString() || backendItem.id?.toString() || '',
     name: backendItem.Name || backendItem.name || 'Unnamed Item',
     category: typeToCategory[backendItem.Type] || 'tops',
     colors: backendItem.Colors ? backendItem.Colors.split(',').map((c: string) => c.trim().toLowerCase()) : [],
     style: backendItem.Styles ? backendItem.Styles.split(',').map((s: string) => s.trim().toLowerCase()) : [],
+    styles2,
+    minTemp: typeof minTemp === 'number' ? minTemp : minTemp != null ? Number(minTemp) : undefined,
+    maxTemp: typeof maxTemp === 'number' ? maxTemp : maxTemp != null ? Number(maxTemp) : undefined,
     imageUrl: backendItem.Image_url || backendItem.imageUrl || undefined,
   };
 }

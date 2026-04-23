@@ -393,8 +393,9 @@ export function MainApp() {
                      item.category,
             colors: item.colors,
             styles: item.style,
-            minTemp: 0,  // Default values
-            maxTemp: 100,
+            styles2: item.styles2,
+            minTemp: item.minTemp,
+            maxTemp: item.maxTemp,
           },
           imageUrl: item.imageUrl || '',
         };
